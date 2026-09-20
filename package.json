@@ -1,0 +1,38 @@
+{
+  "name": "@konitif/nodal-blockly",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "description": "Hosted Blockly editing projection of canonical KONITIF Workflow Compositions.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeMouf/konitif-nodal-blockly.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./surface": { "types": "./dist/surface.d.ts", "import": "./dist/surface.js" }
+  },
+  "files": ["LICENSE.md", "dist", "README.md", "package.json"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test tests/*.test.mjs",
+    "verify:package": "node scripts/verify-package.mjs",
+    "prepack": "npm run build && npm test",
+    "prepublishOnly": "npm run build && npm test && npm run verify:package"
+  },
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "@konitif/composition": "0.284.3",
+    "@konitif/nodal": "0.285.1",
+    "@konitif/tools": "0.284.4",
+    "blockly": "12.1.0"
+  },
+  "devDependencies": { "typescript": "5.9.3" }
+}
