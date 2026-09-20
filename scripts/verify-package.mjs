@@ -68,4 +68,4 @@ console.log(JSON.stringify({
   evidence: archiveDirectory,
   workspace: evidence,
   archive
-}, null, 2));
+}));
