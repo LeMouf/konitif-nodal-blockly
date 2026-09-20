@@ -6,7 +6,7 @@ export * from './session.js';
 
 /** Declaration only. No catalog, workspace, contribution or subscription is activated here. */
 export const nodalBlocklyToolModule = defineKonitifToolModule({
-  id: 'konitif.nodal-blockly', name: 'Blockly', version: '0.1.0',
+  id: 'konitif.nodal-blockly', name: 'Blockly', version: '0.284.2',
   scope: 'generic', capability: 'block-workflow-authoring',
   implementationBindingKey: 'konitif.nodal-blockly',
   description: 'Blockly projection over the Nodal and Composition contracts, hosted through explicit ports.',
