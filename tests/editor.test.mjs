@@ -11,7 +11,7 @@ import { mixedScenario } from './mixedFixture.mjs';
 import { statementScenario } from './statementFixture.mjs';
 
 const dom = new JSDOM('<!doctype html><html><body><div id="one"></div><div id="two"></div></body></html>', {pretendToBeVisual:true,url:'http://localhost'});
-for(const name of ['window','document','HTMLElement','Element','Node','DocumentFragment','SVGElement','DOMParser','XMLSerializer','HTMLCanvasElement','Event','MouseEvent','KeyboardEvent']) globalThis[name]=dom.window[name];
+for(const name of ['window','document','HTMLElement','Element','Node','DocumentFragment','SVGElement','DOMParser','XMLSerializer','HTMLCanvasElement','Event','FocusEvent','MouseEvent','KeyboardEvent']) globalThis[name]=dom.window[name];
 Object.defineProperty(globalThis,'navigator',{value:dom.window.navigator,configurable:true});
 globalThis.getComputedStyle=dom.window.getComputedStyle;
 // jsdom has no SVG layout or canvas. Only geometry/text measurement are replaced, not Blockly logic.
@@ -195,6 +195,31 @@ test('active block highlighting resolves parsed vendor colours rather than CSS v
   assert.doesNotThrow(()=>editor.highlight(ids.a));assert.ok(document.querySelector('#one .blocklyHighlighted'));
   editor.highlight(null);assert.equal(document.querySelector('#one .blocklyHighlighted'),null);
  }finally{editor.dispose();}
+});
+
+test('searchable option fields filter labels and values without changing canonical selection', async()=>{
+ const {snapshot,contributions}=structuredScenario();
+ const options=[
+  {label:'Choose animation',value:''},
+  {label:'Alpha Walk',value:'catalog-alpha-walk'},
+  {label:'Beta Gesture',value:'catalog-beta-gesture'}
+ ];
+ contributions[0]={...contributions[0],fields:[{...contributions[0].fields[0],options,searchable:true,searchPlaceholder:'Search animations'}]};
+ const editor=createBlocklyEditor(api,document.getElementById('one'));
+ try{
+  editor.render(projectBlocklyWorkflow(snapshot,contributions),contributions,snapshot);
+  const workspace=api.Workspace.getAll().find(w=>!w.isFlyout&&w.rendered);
+  const field=workspace.getBlockById('first').getField('field_0');
+  field.showEditor();await Promise.resolve();
+  const search=document.querySelector('.konitifBlocklySearchableDropdownInput');
+  assert.ok(search);assert.equal(search.placeholder,'Search animations');
+  search.value='beta';search.dispatchEvent(new Event('input',{bubbles:true}));
+  const visible=[...document.querySelectorAll('.blocklyDropDownDiv .blocklyMenuItem')].filter(item=>!item.hidden);
+  assert.equal(visible.length,1);assert.match(visible[0].textContent,/Beta Gesture/);
+  assert.equal(field.getValue(),'');
+  visible[0].dispatchEvent(new MouseEvent('pointerup',{bubbles:true,cancelable:true,clientX:10,clientY:10}));
+  assert.equal(field.getValue(),'catalog-beta-gesture');
+ }finally{api.DropDownDiv.hideWithoutAnimation();editor.dispose();}
 });
 
 test('vendor insertion markers never become canonical occurrences or connections',()=>{
