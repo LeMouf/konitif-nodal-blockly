@@ -9,7 +9,10 @@ export interface BlocklyNodeContribution {
   label?: string;
   colour?: string;
   fields?: readonly { configKey: string; label: string; editor: 'number' | 'text' | 'boolean';
-    options?: readonly { label: string; value: string }[] }[];
+    options?: readonly { label: string; value: string }[];
+    /** Presentation hint: render large option sets with a local search/filter surface. */
+    searchable?: boolean;
+    searchPlaceholder?: string }[];
   composite?: BlocklyCompositeReference;
   /** Native statement projection. Container inputs reference the tail of their stack.
    * The host's shared dialect owns the meaning of these ports, not Blockly. */

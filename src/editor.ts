@@ -150,6 +150,69 @@ export function createBlocklyEditor(api: typeof Blockly, element: HTMLElement, m
   const releaseMessages = acquireBlocklyMessages(api,messages);
   const renderer = leaseBlocklyGlassRenderer(api, namespace);
   const releaseVariableReads = leaseBlockly12VariableReads(api);
+  class SearchableFieldDropdown extends api.FieldDropdown {
+    constructor(options: [string, string][], private readonly searchPlaceholder: string) {
+      super(options);
+    }
+    protected override showEditor_(event?: MouseEvent): void {
+      super.showEditor_(event);
+      const content = api.DropDownDiv.getContentDiv();
+      const menu = content.querySelector<HTMLElement>('.blocklyMenu');
+      if (!menu) return;
+      const options = this.getOptions(false);
+      const items = [...menu.querySelectorAll<HTMLElement>('.blocklyMenuItem')];
+      const search = document.createElement('input');
+      search.type = 'search';
+      search.autocomplete = 'off';
+      search.placeholder = this.searchPlaceholder;
+      search.setAttribute('aria-label', this.searchPlaceholder);
+      search.className = 'konitifBlocklySearchableDropdownInput';
+      Object.assign(search.style, {
+        boxSizing: 'border-box', width: '100%', height: '30px', marginBottom: '5px', padding: '0 9px',
+        border: '1px solid var(--konitif-blockly-field-border, #8ba0b8)', borderRadius: '5px',
+        outline: 'none', color: 'var(--konitif-blockly-ink, #eef5fb)',
+        background: 'var(--konitif-blockly-canvas, #07111d)'
+      });
+      const empty = document.createElement('p');
+      empty.className = 'konitifBlocklySearchableDropdownEmpty';
+      empty.textContent = 'No matching option';
+      empty.hidden = true;
+      Object.assign(empty.style, {
+        margin: '7px 5px 3px', color: 'var(--konitif-blockly-muted, #8fa6b8)', fontSize: '12px'
+      });
+      content.prepend(search);
+      content.append(empty);
+      content.style.height = 'auto';
+      content.style.minWidth = 'min(320px, calc(100vw - 24px))';
+      menu.style.boxSizing = 'border-box';
+      menu.style.maxHeight = '270px';
+      menu.style.overflowY = 'auto';
+      menu.style.overscrollBehavior = 'contain';
+      const filter = (): void => {
+        const query = search.value.trim().toLocaleLowerCase();
+        let visible = 0;
+        items.forEach((item, index) => {
+          const option = options[index];
+          const label = typeof option?.[0] === 'string' ? option[0] : '';
+          const value = option?.[1] ?? '';
+          const matches = !query || `${label}\n${value}`.toLocaleLowerCase().includes(query);
+          item.hidden = !matches;
+          item.setAttribute('aria-hidden', matches ? 'false' : 'true');
+          if (matches) visible += 1;
+        });
+        empty.hidden = visible > 0;
+      };
+      search.addEventListener('input', filter);
+      search.addEventListener('pointerdown', pointerEvent => pointerEvent.stopPropagation());
+      search.addEventListener('keydown', keyboardEvent => {
+        keyboardEvent.stopPropagation();
+        if (keyboardEvent.key !== 'Escape') return;
+        keyboardEvent.preventDefault();
+        api.DropDownDiv.hideIfOwner(this);
+      });
+      queueMicrotask(() => search.focus());
+    }
+  }
   // Blockly parses these two component colours during gestures/highlighting;
   // unlike background styles, they cannot receive a raw CSS variable.
   const accent = () => api.utils.colour.parse(getComputedStyle(element).getPropertyValue('--konitif-blockly-accent').trim()) ?? '#4979a8';
@@ -336,7 +399,11 @@ export function createBlocklyEditor(api: typeof Blockly, element: HTMLElement, m
             const value = definition.defaultConfig[field.configKey];
             const editor = field.editor === 'number' ? new api.FieldNumber(Number(value ?? 0))
               : field.editor === 'boolean' ? new api.FieldCheckbox(value ? 'TRUE' : 'FALSE')
-              : field.options?.length ? new api.FieldDropdown(field.options.map(o => [o.label,o.value])) : new api.FieldTextInput(String(value ?? ''));
+              : field.options?.length
+                ? field.searchable
+                  ? new SearchableFieldDropdown(field.options.map(o => [o.label, o.value]), field.searchPlaceholder ?? 'Search…')
+                  : new api.FieldDropdown(field.options.map(o => [o.label,o.value]))
+                : new api.FieldTextInput(String(value ?? ''));
             if(editor instanceof api.FieldDropdown)editor.maxDisplayLength=32;
             this.appendDummyInput().appendField(field.label).appendField(editor, fields.get(field.configKey)!);
           }
