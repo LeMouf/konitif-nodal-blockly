@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0.0",
+  "package": "@konitif/nodal-blockly",
+  "intent": "Edit a canonical Workflow through a disposable block projection and explicit host admission.",
+  "clusters": [
+    {
+      "id": "host-contracts",
+      "title": "Host contracts",
+      "summary": "Read and propose edits against an identified canonical subject.",
+      "authority": "The host owns canonical state and admission.",
+      "owns": [
+        "explicit host ports",
+        "editing and runtime availability contracts"
+      ],
+      "doesNotOwn": [
+        "canonical persistence",
+        "execution permission"
+      ],
+      "workflow": [
+        "Read",
+        "Validate",
+        "Request admission"
+      ],
+      "sources": [
+        "contracts.ts",
+        "index.ts"
+      ]
+    },
+    {
+      "id": "contribution-catalog",
+      "title": "Scoped contributions",
+      "summary": "Lease block presentations against shared dialect definitions.",
+      "authority": "The catalog owns presentation registrations, not domain semantics.",
+      "owns": [
+        "registration leases",
+        "catalog lifecycle"
+      ],
+      "doesNotOwn": [
+        "executors",
+        "canonical occurrences"
+      ],
+      "workflow": [
+        "Register",
+        "Resolve",
+        "Release"
+      ],
+      "sources": [
+        "catalog.ts"
+      ]
+    },
+    {
+      "id": "projection",
+      "title": "Workflow projection",
+      "summary": "Derive block readings and validate semantic edits without a second persisted workflow.",
+      "authority": "Derived projection values and edit proposals.",
+      "owns": [
+        "projection diagnostics",
+        "reading conversion",
+        "editing adapters"
+      ],
+      "doesNotOwn": [
+        "canonical identity",
+        "runtime scheduling"
+      ],
+      "workflow": [
+        "Read",
+        "Project",
+        "Propose"
+      ],
+      "sources": [
+        "projection.ts"
+      ]
+    },
+    {
+      "id": "session",
+      "title": "Disposable session",
+      "summary": "Coordinate host subscriptions and revision-sensitive editing.",
+      "authority": "A session mediates host ports; the host admits commits.",
+      "owns": [
+        "subscriptions",
+        "session disposal",
+        "edit mediation"
+      ],
+      "doesNotOwn": [
+        "domain store",
+        "physical effects"
+      ],
+      "workflow": [
+        "Subscribe",
+        "Edit",
+        "Dispose"
+      ],
+      "sources": [
+        "session.ts"
+      ]
+    }
+  ]
+}

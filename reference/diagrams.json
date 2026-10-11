@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0.0",
+  "package": "@konitif/nodal-blockly",
+  "diagrams": [
+    {
+      "id": "host-admitted-edit",
+      "title": "From a block gesture to an admitted revision",
+      "kind": "boundary",
+      "summary": "The surface proposes a semantic change while the host retains canonical identity, validation and admission.",
+      "nodes": [
+        {
+          "id": "read",
+          "label": "Host reading",
+          "description": "Read the canonical subject and current revision."
+        },
+        {
+          "id": "surface",
+          "label": "Block projection",
+          "description": "Expose shared definitions without owning their semantics."
+        },
+        {
+          "id": "proposal",
+          "label": "Edit proposal",
+          "description": "Validate the complete graph and preserve existing identities."
+        },
+        {
+          "id": "admission",
+          "label": "Host admission",
+          "description": "Compare the base revision and accept or reject atomically."
+        }
+      ],
+      "edges": [
+        {
+          "from": "read",
+          "to": "surface"
+        },
+        {
+          "from": "surface",
+          "to": "proposal"
+        },
+        {
+          "from": "proposal",
+          "to": "admission"
+        },
+        {
+          "from": "admission",
+          "to": "read"
+        }
+      ],
+      "caption": "An optional runtime is a separate host capability. Mounting or publishing this editor grants no execution authority."
+    }
+  ]
+}
