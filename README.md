@@ -104,7 +104,7 @@ npm run build
 npm test
 ```
 
-The tests exercise the real Blockly renderer/workspaces in jsdom, including genuine block creation and field changes. SVG layout and canvas text measurement are stubbed because jsdom has no layout engine. They do not establish browser rendering quality or complete Behavior Studio integration. Reference definitions and executors exist only in test fixtures and are never installed into the shipped catalog.
+The tests exercise the real Blockly renderer/workspaces in jsdom, including genuine block creation and field changes. SVG layout and canvas text measurement are stubbed because jsdom has no layout engine. They do not establish browser rendering quality or complete host application integration. Reference definitions and executors exist only in test fixtures and are never installed into the shipped catalog.
 
 ## Distribution
 
